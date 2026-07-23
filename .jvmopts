@@ -1,0 +1,7 @@
+-Xmx2G
+-XX:+UseG1GC
+--add-exports=java.base/sun.security.util=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED

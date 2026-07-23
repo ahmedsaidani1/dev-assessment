@@ -1,0 +1,37 @@
+# SBT
+target/
+project/target/
+project/project/
+lib_managed/
+src_managed/
+.cache-*
+.history
+.lib/
+dist/*
+
+# IDE
+.idea/
+*.iml
+.idea_modules/
+.vscode/
+.bsp/
+.metals/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Play Framework
+logs/
+RUNNING_PID
+server.pid
+
+# Java
+*.class
+*.log
+*.jar
+*.war
+
+# Database
+*.db
+*.sqlite
