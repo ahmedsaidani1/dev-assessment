@@ -16,18 +16,53 @@ var Task = Backbone.Model.extend({
     
     urlRoot: '/api/tasks',
     
-    // Override sync to route POST to NestJS
+    // Override sync to route POST to NestJS, everything else to Play
     sync: function(method, model, options) {
         options = options || {};
+        
         if (method === 'create') {
             console.log('[Backbone] Routing POST request to NestJS backend');
             options.url = API_ENDPOINTS.nestjs;
-            // NestJS DTO only accepts title, description, status
             options.contentType = 'application/json';
             options.processData = false;
             options.data = JSON.stringify(model.pick('title', 'description', 'status'));
+            
+            // After successful creation in NestJS, also save to Play
+            var originalSuccess = options.success;
+            options.success = function(response, textStatus, jqXHR) {
+                console.log('[Backbone] Task created in NestJS, syncing to Play...');
+                
+                // Now save to Play for persistence
+                $.ajax({
+                    type: 'POST',
+                    url: API_ENDPOINTS.play,
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        title: response.title,
+                        description: response.description,
+                        status: response.status
+                    }),
+                    success: function(playResponse) {
+                        console.log('[Backbone] Task synced to Play database');
+                        // Update model with Play's response (canonical data)
+                        model.set(playResponse);
+                        if (originalSuccess) {
+                            originalSuccess.call(options.context, playResponse, textStatus, jqXHR);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.warn('[Backbone] Failed to sync to Play, using NestJS response');
+                        // Still proceed with NestJS response even if Play sync fails
+                        model.set(response);
+                        if (originalSuccess) {
+                            originalSuccess.call(options.context, response, textStatus, jqXHR);
+                        }
+                    }
+                });
+            };
         }
-        // All other methods (read, update, delete) go to Play
+        
+        // All other methods (read, patch, update, delete) go to Play
         return Backbone.sync(method, model, options);
     }
 });
@@ -35,7 +70,7 @@ var Task = Backbone.Model.extend({
 // Task Collection
 var TaskCollection = Backbone.Collection.extend({
     model: Task,
-    url: '/api/tasks',
+    url: '/api/tasks',  // Fetch from Play (which has all tasks)
     
     comparator: function(task) {
         return -new Date(task.get('createdAt')).getTime();

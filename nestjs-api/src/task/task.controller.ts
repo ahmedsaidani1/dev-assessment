@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -48,6 +49,15 @@ export class TaskController {
     @Body() updateData: Partial<Task>,
   ): Promise<Task | null> {
     this.logger.log(`[NestJS] PUT /api/tasks/${id} - Updating task`);
+    return this.taskService.update(+id, updateData);
+  }
+
+  @Patch(':id')
+  async patch(
+    @Param('id') id: string,
+    @Body() updateData: Partial<Task>,
+  ): Promise<Task | null> {
+    this.logger.log(`[NestJS] PATCH /api/tasks/${id} - Patching task`);
     return this.taskService.update(+id, updateData);
   }
 
