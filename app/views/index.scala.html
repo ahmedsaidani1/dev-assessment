@@ -4,20 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Management - Legacy Application</title>
+    <title>Task Management - Hybrid Migration</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
 </head>
 <body>
     <div id="app">
         <header>
             <h1>Task Management System</h1>
-            <p class="subtitle">Legacy Architecture: Play Framework + Backbone.js</p>
+            <p class="subtitle">
+                <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 3px;">
+                    🔄 Hybrid Architecture: Backbone.js + React
+                </span>
+            </p>
         </header>
         
         <main class="container">
-            <!-- Task Creation Form -->
+            <!-- Task Creation Form (Backbone - Legacy) -->
             <section id="task-form-section">
-                <h2>Create New Task</h2>
+                <h2>Create New Task <span class="tech-badge backbone">Backbone.js</span></h2>
                 <form id="task-form">
                     <div class="form-group">
                         <label for="task-title">Title *</label>
@@ -39,44 +43,45 @@
                 </form>
             </section>
             
-            <!-- Task List -->
+            <!-- Task List (React - Modern) -->
             <section id="task-list-section">
-                <h2>Tasks</h2>
-                <div id="task-list"></div>
+                <h2>Tasks <span class="tech-badge react">React</span></h2>
+                <!-- React will mount here -->
+                <div id="react-task-list"></div>
+                
+                <!-- Fallback for no React (will be hidden) -->
+                <div id="backbone-task-list" style="display: none;"></div>
+            </section>
+            
+            <!-- Migration Info Box -->
+            <section id="migration-info" style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1rem; margin-top: 2rem; border-radius: 4px;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2;">🔄 Hybrid Architecture</h3>
+                <p style="margin: 0; font-size: 0.9rem;">
+                    <strong>Form</strong> = Backbone.js (Legacy) | 
+                    <strong>Task List</strong> = React (Modern) | 
+                    <strong>Data</strong> = Shared via Bridge Pattern
+                </p>
             </section>
         </main>
     </div>
     
-    <!-- Task Item Template -->
-    <script type="text/template" id="task-template">
-        <div class="task-item" data-id="<%= id %>">
-            <div class="task-header">
-                <h3 class="task-title"><%= title %></h3>
-                <span class="task-status status-<%= status.toLowerCase() %>"><%= status.replace('_', ' ') %></span>
-            </div>
-            <% if (description) { %>
-                <p class="task-description"><%= description %></p>
-            <% } %>
-            <div class="task-actions">
-                <select class="status-select" data-id="<%= id %>">
-                    <option value="TODO" <%= status === 'TODO' ? 'selected' : '' %>>To Do</option>
-                    <option value="IN_PROGRESS" <%= status === 'IN_PROGRESS' ? 'selected' : '' %>>In Progress</option>
-                    <option value="DONE" <%= status === 'DONE' ? 'selected' : '' %>>Done</option>
-                </select>
-                <button class="btn btn-danger btn-delete" data-id="<%= id %>">Delete</button>
-            </div>
-            <div class="task-meta">
-                <small>Created: <%= new Date(createdAt).toLocaleString() %></small>
-            </div>
-        </div>
-    </script>
-    
     <!-- Dependencies -->
+    <!-- Backbone Dependencies -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
     
-    <!-- Backbone Application -->
+    <!-- React Dependencies -->
+    <script crossorigin src="https://unpkg.com/react@@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@@18/umd/react-dom.development.js"></script>
+    
+    <!-- Backbone Application (Legacy) -->
     <script src="@routes.Assets.versioned("javascripts/app.js")"></script>
+    
+    <!-- React Components (Modern) - Pre-compiled for faster loading -->
+    <script src="@routes.Assets.versioned("javascripts/react-task-list-compiled.js")"></script>
+    
+    <!-- Bridge between Backbone and React -->
+    <script src="@routes.Assets.versioned("javascripts/backbone-react-bridge.js")"></script>
 </body>
 </html>
